@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { create } from './../backend/controllers/friendController';
 
 class CreateForm extends Component {
     state = {
@@ -13,8 +12,8 @@ class CreateForm extends Component {
 
     onFormSubmit = () => {
         const { name, age } = this.state;
-
-        create({ name, age });
+        // http request to backend create method
+        // create({ name, age });
     };
     
     render() {
