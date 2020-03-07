@@ -3,6 +3,7 @@ const supertest = require('supertest');
 const app = require('../../app');
 const dbConnect = require('../../database/connect');
 const FriendModel = require('../../database/models/friendModel');
+const { friendsQuery } = require('./queries');
 
 let mongoose;
 let id;
@@ -14,7 +15,7 @@ beforeAll(async () => {
     let { _id: id } = await FriendModel.create({
         name: 'Mark',
         age: 30
-    })
+    });
 });
 
 afterAll(async () => {
@@ -37,10 +38,14 @@ describe('GraphQL basic tests', () => {
     });
 });
 
-describe('GraphQL tests: FRIENDS QUERIES', () => {
-    it('should be able to retrieve the id, name, and age of a friend', async () => {
+describe('GraphQL tests: FRIEND/S QUERIES', () => {
+    it('should be able to retrieve all friends', async () => {
         const response = await supertest(app)
-            .get('/graphql')
+            .post('/graphql')
+            .send({ query: '{ friends { id name age } }' })
+        const { data: { friends } } = JSON.parse(response.text);
+        expect(response.status).toEqual(200);
+        expect(friends).toHaveLength(1);
     });
 
     it('should be able to retrieve details of a friend, given an id' , () => {
