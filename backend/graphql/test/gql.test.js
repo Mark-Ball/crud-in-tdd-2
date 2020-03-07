@@ -1,7 +1,28 @@
 const supertest = require('supertest');
-const app = require('../../app');
 
-describe('GraphQL integration tests', () => {
+const app = require('../../app');
+const dbConnect = require('../../database/connect');
+const FriendModel = require('../../database/models/friendModel');
+
+let mongoose;
+let id;
+
+beforeAll(async () => {
+    mongoose = await dbConnect(process.env.DB_HOST_TESTING);
+
+    // create a user in the db
+    let { _id: id } = await FriendModel.create({
+        name: 'Mark',
+        age: 30
+    })
+});
+
+afterAll(async () => {
+    await FriendModel.deleteMany({});
+    await mongoose.connection.close();
+});
+
+describe('GraphQL basic tests', () => {
     it('should receive a response at root', async () => {
         const response = await supertest(app)
             .get('/');
@@ -13,5 +34,20 @@ describe('GraphQL integration tests', () => {
         const response = await supertest(app)
             .get('/graphql');
         expect(response.status).toEqual(400);
+    });
+});
+
+describe('GraphQL tests: FRIENDS QUERIES', () => {
+    it('should be able to retrieve the id, name, and age of a friend', async () => {
+        const response = await supertest(app)
+            .get('/graphql')
+    });
+
+    it('should be able to retrieve details of a friend, given an id' , () => {
+
+    });
+
+    it('should return 400 if an id was not', () => {
+
     });
 });
