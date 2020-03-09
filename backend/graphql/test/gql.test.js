@@ -100,15 +100,15 @@ describe('GraphQL tests | Controller: friend | Action: query', () => {
 describe('GraphQL tests | Controller: friend | Action: mutation, create', () => {
     it('should respond with the created friend if the request is valid', async () => {
         const postData = {
-            mutation: friendCreate,
+            query: friendCreate,
             variables: { name: 'Jon', age: 25 }
         };
         const response = await supertest(app)
             .post('/graphql')
             .send(postData);
         const { 
-            data: { friend: { name } }, // destructures name
-            data: { friend: { age } } // destructured age
+            data: { addFriend: { name } }, // destructures name
+            data: { addFriend: { age } } // destructured age
         } = JSON.parse(response.text);
 
         expect(response.status).toBe(200);

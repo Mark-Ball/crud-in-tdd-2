@@ -8,6 +8,7 @@ const {
     GraphQLID,
     GraphQLInt,
     GraphQLList,
+    GraphQLNonNull
 } = graphql;
 
 const FriendType = new GraphQLObjectType({
@@ -40,6 +41,25 @@ const RootQuery = new GraphQLObjectType({
     }
 });
 
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        // create a friend by passing name and age
+        addFriend: {
+            type: FriendType,
+            args: {
+                name: { type: new GraphQLNonNull(GraphQLString) },
+                age: { type: GraphQLInt }
+            },
+            resolve(parent, args) {
+                const { name, age } = args;
+                return FriendModel.create({ name, age });
+            }
+        }
+    }
+});
+
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: Mutation
 });
