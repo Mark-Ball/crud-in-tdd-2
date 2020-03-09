@@ -35,9 +35,19 @@ const friendCreate = `
     }
 `;
 
+const friendEdit = `
+    mutation($id: ID!, $name String, $age: Int) {
+        editFriend(name: $name, age: $age) {
+            name
+            age
+        }
+    }
+`;
+
 module.exports = {
     friendsQuery,
     badQuery,
     friendQuery,
-    friendCreate
+    friendCreate,
+    friendEdit
 };

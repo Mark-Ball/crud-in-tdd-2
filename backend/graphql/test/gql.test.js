@@ -7,7 +7,8 @@ const {
     friendsQuery,
     badQuery,
     friendQuery,
-    friendCreate
+    friendCreate,
+    friendEdit
 } = require('./mockQueries');
 
 let mongoose;
@@ -46,7 +47,7 @@ describe('GraphQL basic tests', () => {
     });
 });
 
-describe('GraphQL tests | Controller: friend | Action: query', () => {
+describe('GraphQL tests: querying friends, () => {
     it('should be able to retrieve all friends', async () => {
         const response = await supertest(app)
             .post('/graphql')
@@ -97,7 +98,7 @@ describe('GraphQL tests | Controller: friend | Action: query', () => {
     });
 });
 
-describe('GraphQL tests | Controller: friend | Action: mutation, create', () => {
+describe('GraphQL tests: creating friends', () => {
     it('should respond with the created friend if the request is valid', async () => {
         const postData = {
             query: friendCreate,
@@ -118,8 +119,64 @@ describe('GraphQL tests | Controller: friend | Action: mutation, create', () => 
 
     it('should respond with 400 if data is missing', async () => {
         const postData = {
-            mutation: friendCreate,
+            query: friendCreate,
             variables: { name: 'Tim' }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+
+        expect(response.status).toBe(400);
+    });
+});
+
+describe('GraphQL tests: editting friends', () => {
+    it('should update a friend if valid details are provided', () => {
+        const postData = {
+            query: friendEdit,
+            variables: { id, name: 'James', age: 35 }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+        const {
+            data: { editFriend: { name } },
+            data: { editFriend: { age } }
+        } = JSON.parse(response.text);
+
+        expect(response.status).toBe(200);
+        expect(name).toBe('James');
+        expect(age).toBe(35);
+    });
+
+    it('should error if no id provided', () => {
+        const postData = {
+            query: friendEdit,
+            variables: { name: 'James', age: 35 }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+
+        expect(response.status).toBe(400);
+    });
+
+    it('should error if id of non-existent entry provided', () => {
+        const postData = {
+            query: friendEdit,
+            variables: { id: 1234, name: 'James', age: 35 }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+
+        expect(response.status).toBe(400);
+    });
+
+    it('should error if someone attempts to remove a non-nullable field', () => {
+        const postData = {
+            query: friendEdit,
+            variables: { id, name: '', age: 35 }
         };
         const response = await supertest(app)
             .post('/graphql')
