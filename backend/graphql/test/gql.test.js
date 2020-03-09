@@ -3,7 +3,12 @@ const supertest = require('supertest');
 const app = require('../../app');
 const dbConnect = require('../../database/connect');
 const FriendModel = require('../../database/models/friendModel');
-const { friendsQuery, badQuery, friendQuery } = require('./queries');
+const {
+    friendsQuery,
+    badQuery,
+    friendQuery,
+    friendCreate
+} = require('./mockQueries');
 
 let mongoose;
 let id;
@@ -41,7 +46,7 @@ describe('GraphQL basic tests', () => {
     });
 });
 
-describe('GraphQL tests: FRIEND/S QUERIES', () => {
+describe('GraphQL tests | Controller: friend | Action: query', () => {
     it('should be able to retrieve all friends', async () => {
         const response = await supertest(app)
             .post('/graphql')
@@ -79,7 +84,7 @@ describe('GraphQL tests: FRIEND/S QUERIES', () => {
         expect(age).toBe(30);
     });
 
-    it('should return 400 if an id was not provided', async () => {
+    it('should respond with 400 if an id was not provided', async () => {
         const postData = {
             query: friendQuery,
             variables: {}
@@ -89,5 +94,37 @@ describe('GraphQL tests: FRIEND/S QUERIES', () => {
             .send(postData);
 
         expect(response.status).toBe(500);
+    });
+});
+
+describe('GraphQL tests | Controller: friend | Action: mutation, create', () => {
+    it('should respond with the created friend if the request is valid', async () => {
+        const postData = {
+            mutation: friendCreate,
+            variables: { name: 'Jon', age: 25 }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+        const { 
+            data: { friend: { name } }, // destructures name
+            data: { friend: { age } } // destructured age
+        } = JSON.parse(response.text);
+
+        expect(response.status).toBe(200);
+        expect(name).toBe('Jon');
+        expect(age).toBe(25);
+    });
+
+    it('should respond with 400 if data is missing', async () => {
+        const postData = {
+            mutation: friendCreate,
+            variables: { name: 'Tim' }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+
+        expect(response.status).toBe(400);
     });
 });
