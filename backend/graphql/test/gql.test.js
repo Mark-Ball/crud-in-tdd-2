@@ -133,7 +133,7 @@ describe('GraphQL tests: creating friends', () => {
 describe('GraphQL tests: editting friends', () => {
     it('should update a friend if valid details are provided', () => {
         const postData = {
-            query: friendEdit,
+            query: updateFriend,
             variables: { id, name: 'James', age: 35 }
         };
         const response = await supertest(app)
@@ -151,7 +151,7 @@ describe('GraphQL tests: editting friends', () => {
 
     it('should error if no id provided', () => {
         const postData = {
-            query: friendEdit,
+            query: updateFriend,
             variables: { name: 'James', age: 35 }
         };
         const response = await supertest(app)
@@ -163,7 +163,7 @@ describe('GraphQL tests: editting friends', () => {
 
     it('should error if id of non-existent entry provided', () => {
         const postData = {
-            query: friendEdit,
+            query: updateFriend,
             variables: { id: 1234, name: 'James', age: 35 }
         };
         const response = await supertest(app)
@@ -175,7 +175,7 @@ describe('GraphQL tests: editting friends', () => {
 
     it('should error if someone attempts to remove a non-nullable field', () => {
         const postData = {
-            query: friendEdit,
+            query: updateFriend,
             variables: { id, name: '', age: 35 }
         };
         const response = await supertest(app)

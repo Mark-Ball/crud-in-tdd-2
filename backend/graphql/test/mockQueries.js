@@ -35,9 +35,9 @@ const friendCreate = `
     }
 `;
 
-const friendEdit = `
+const updateFriend = `
     mutation($id: ID!, $name String, $age: Int) {
-        editFriend(name: $name, age: $age) {
+        updateFriend(name: $name, age: $age) {
             name
             age
         }
@@ -49,5 +49,5 @@ module.exports = {
     badQuery,
     friendQuery,
     friendCreate,
-    friendEdit
+    updateFriend
 };

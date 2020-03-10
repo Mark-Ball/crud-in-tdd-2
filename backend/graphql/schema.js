@@ -8,7 +8,9 @@ const {
     GraphQLID,
     GraphQLInt,
     GraphQLList,
-    GraphQLNonNull
+    GraphQLNonNull,
+    GraphQLInputObjectType,
+    GraphQLOutputObjectType
 } = graphql;
 
 const FriendType = new GraphQLObjectType({
@@ -54,6 +56,22 @@ const Mutation = new GraphQLObjectType({
             resolve(parent, args) {
                 const { name, age } = args;
                 return FriendModel.create({ name, age });
+            }
+        },
+        // update a friend by passing an id, name, and age
+        updateFriend: {
+            type: FriendType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLID) },
+                name: { type: GraphQLString },
+                age: { type: GraphQLInt }
+            },
+            async resolve(parent, args) {
+                const { id, name, age } = args;
+                const doc = await FriendModel.findById(id);
+                if (name) doc.name = name;
+                if (age) doc.age = age;
+                return doc.save()
             }
         }
     }
