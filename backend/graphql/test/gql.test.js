@@ -197,3 +197,43 @@ describe('GraphQL tests: editing friends', () => {
         expect(name).toBe('Mark');
     });
 });
+
+describe('GraphQL tests: deleting friends', () => {
+    it('should delete a friend when the id is provided', async () => {
+        const postData = {
+            query: deleteFriend, // create this in mockQueries
+            variables: { id }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+        
+        expect(response.status).toBe(200);
+    });
+
+    it('should error when no id is provided', async () => {
+        const postData = {
+            query: deleteFriend,
+            variables: {}
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+        const { errors } = JSON.parse(response.text);
+
+        expect(errors).toBeTruthy();
+    });
+
+    it('should error when the id does not exist in db', async () => {
+        const postData = {
+            query: deleteFriend,
+            variables: { id: 1234 }
+        };
+        const response = await supertest(app)
+            .post('/graphql')
+            .send(postData);
+        const { errors } = JSON.parse(response.text);
+
+        expect(errors).toBeTruthy();
+    });
+});
