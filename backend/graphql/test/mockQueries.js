@@ -1,4 +1,4 @@
-const friendsQuery = `
+const queryFriends = `
     query {
         friends {
             id
@@ -16,7 +16,7 @@ const badQuery = `
     }
 `;
 
-const friendQuery = `
+const queryFriend = `
     query($id: ID!) {
         friend(id: $id) {
             name
@@ -25,7 +25,7 @@ const friendQuery = `
     }
 `;
 
-const friendCreate = `
+const createFriend = `
     mutation($name: String!, $age: Int!) {
         addFriend(name: $name, age: $age) {
             id
@@ -36,8 +36,8 @@ const friendCreate = `
 `;
 
 const updateFriend = `
-    mutation($id: ID!, $name String, $age: Int) {
-        updateFriend(name: $name, age: $age) {
+    mutation($id: ID!, $name: String, $age: Int) {
+        updateFriend(id: $id, name: $name, age: $age) {
             name
             age
         }
@@ -45,9 +45,9 @@ const updateFriend = `
 `;
 
 module.exports = {
-    friendsQuery,
+    queryFriends,
     badQuery,
-    friendQuery,
-    friendCreate,
+    queryFriend,
+    createFriend,
     updateFriend
 };

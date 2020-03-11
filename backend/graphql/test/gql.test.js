@@ -4,11 +4,11 @@ const app = require('../../app');
 const dbConnect = require('../../database/connect');
 const FriendModel = require('../../database/models/friendModel');
 const {
-    friendsQuery,
+    queryFriends,
     badQuery,
-    friendQuery,
-    friendCreate,
-    friendEdit
+    queryFriend,
+    createFriend,
+    updateFriend
 } = require('./mockQueries');
 
 let mongoose;
@@ -16,7 +16,9 @@ let id;
 
 beforeAll(async () => {
     mongoose = await dbConnect(process.env.DB_HOST_TESTING);
+});
 
+beforeEach(async () => {
     // create a user in the db, get the id
     const friend = await FriendModel.create({
         name: 'Mark',
@@ -25,8 +27,12 @@ beforeAll(async () => {
     id = friend._id
 });
 
-afterAll(async () => {
+afterEach(async () => {
+    // delete all entries in the friends collection
     await FriendModel.deleteMany({});
+});
+
+afterAll(async () => {
     await mongoose.connection.close();
 });
 
@@ -47,11 +53,11 @@ describe('GraphQL basic tests', () => {
     });
 });
 
-describe('GraphQL tests: querying friends, () => {
+describe('GraphQL tests: querying friends', () => {
     it('should be able to retrieve all friends', async () => {
         const response = await supertest(app)
             .post('/graphql')
-            .send({ query: friendsQuery });
+            .send({ query: queryFriends });
         const { data: { friends } } = JSON.parse(response.text);
 
         expect(response.status).toBe(200);
@@ -68,7 +74,7 @@ describe('GraphQL tests: querying friends, () => {
 
     it('should be able to retrieve details of a friend, given an id' , async () => {
         const postData = {
-            query: friendQuery,
+            query: queryFriend,
             variables: { id }
         };
 
@@ -87,7 +93,7 @@ describe('GraphQL tests: querying friends, () => {
 
     it('should respond with 400 if an id was not provided', async () => {
         const postData = {
-            query: friendQuery,
+            query: queryFriend,
             variables: {}
         };
         const response = await supertest(app)
@@ -101,7 +107,7 @@ describe('GraphQL tests: querying friends, () => {
 describe('GraphQL tests: creating friends', () => {
     it('should respond with the created friend if the request is valid', async () => {
         const postData = {
-            query: friendCreate,
+            query: createFriend,
             variables: { name: 'Jon', age: 25 }
         };
         const response = await supertest(app)
@@ -117,21 +123,21 @@ describe('GraphQL tests: creating friends', () => {
         expect(age).toBe(25);
     });
 
-    it('should respond with 400 if data is missing', async () => {
+    it('should respond with 500 if data is missing', async () => {
         const postData = {
-            query: friendCreate,
+            query: createFriend,
             variables: { name: 'Tim' }
         };
         const response = await supertest(app)
             .post('/graphql')
             .send(postData);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(500);
     });
 });
 
-describe('GraphQL tests: editting friends', () => {
-    it('should update a friend if valid details are provided', () => {
+describe('GraphQL tests: editing friends', () => {
+    it('should update a friend if valid details are provided', async () => {
         const postData = {
             query: updateFriend,
             variables: { id, name: 'James', age: 35 }
@@ -140,16 +146,17 @@ describe('GraphQL tests: editting friends', () => {
             .post('/graphql')
             .send(postData);
         const {
-            data: { editFriend: { name } },
-            data: { editFriend: { age } }
+            data: { updateFriend: { name } },
+            data: { updateFriend: { age } }
         } = JSON.parse(response.text);
+        console.log(JSON.parse(response.text));
 
         expect(response.status).toBe(200);
         expect(name).toBe('James');
         expect(age).toBe(35);
     });
 
-    it('should error if no id provided', () => {
+    it('should error if no id provided', async () => {
         const postData = {
             query: updateFriend,
             variables: { name: 'James', age: 35 }
@@ -158,10 +165,10 @@ describe('GraphQL tests: editting friends', () => {
             .post('/graphql')
             .send(postData);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(500);
     });
 
-    it('should error if id of non-existent entry provided', () => {
+    it('should error if id of non-existent entry provided', async () => {
         const postData = {
             query: updateFriend,
             variables: { id: 1234, name: 'James', age: 35 }
@@ -169,11 +176,13 @@ describe('GraphQL tests: editting friends', () => {
         const response = await supertest(app)
             .post('/graphql')
             .send(postData);
+        const { errors } = JSON.parse(response.text);
 
-        expect(response.status).toBe(400);
+        expect(errors).toBeTruthy();
     });
 
-    it('should error if someone attempts to remove a non-nullable field', () => {
+    it('should disallow removal of fields ', async () => {
+        // attempting to change name to empty string
         const postData = {
             query: updateFriend,
             variables: { id, name: '', age: 35 }
@@ -182,6 +191,9 @@ describe('GraphQL tests: editting friends', () => {
             .post('/graphql')
             .send(postData);
 
-        expect(response.status).toBe(400);
+        // name should remain unchanged i.e. still 'Mark'
+        const { data: { updateFriend: { name } } } = JSON.parse(response.text);
+
+        expect(name).toBe('Mark');
     });
 });

@@ -8,9 +8,7 @@ const {
     GraphQLID,
     GraphQLInt,
     GraphQLList,
-    GraphQLNonNull,
-    GraphQLInputObjectType,
-    GraphQLOutputObjectType
+    GraphQLNonNull
 } = graphql;
 
 const FriendType = new GraphQLObjectType({
