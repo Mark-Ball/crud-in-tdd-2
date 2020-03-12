@@ -1,11 +1,16 @@
 import React from 'react';
 import Enzyme, { shallow, mount } from 'enzyme';
 import EnzymeAdapter from 'enzyme-adapter-react-16';
-import CreateForm from './../components/CreateForm';
+
+import CreateForm from './CreateForm';
 
 Enzyme.configure({ adapter: new EnzymeAdapter() });
 
 describe('CreateForm tests', () => {
+    it('renders without crashing', () => {
+        const wrapper = shallow(<CreateForm />);
+    });
+
     it('component has a form with input fields for name and age', () => {
         const wrapper = shallow(<CreateForm />);
         expect(wrapper.find('form').exists()).toBe(true);
@@ -13,9 +18,10 @@ describe('CreateForm tests', () => {
         expect(wrapper.find("input[name='age']").exists()).toBe(true);
     });
 
-    it('when name is entered, it appears in state', () => {
+    it.only('when name is entered, it appears in state', () => {
         const wrapper = shallow(<CreateForm />);
         const nameInput = wrapper.find("input[name='name']");
+        console.log(nameInput.debug());
         nameInput.simulate('change', { target: { value: 'Mark' }});
 
         expect(wrapper.state('name')).toEqual('Mark');

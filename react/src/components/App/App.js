@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CreateForm from './CreateForm';
+import CreateForm from '../CreateForm/CreateForm';
 
 class App extends Component {
     render() {
