@@ -20,6 +20,15 @@ const FriendType = new GraphQLObjectType({
     }
 });
 
+const DeleteType = new GraphQLObjectType({
+    name:'Delete',
+    fields: {
+        n: { type: GraphQLInt },
+        ok: { type: GraphQLInt },
+        deletedCount: { type: GraphQLInt }
+    }
+});
+
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -74,7 +83,7 @@ const Mutation = new GraphQLObjectType({
         },
         // delete a friend by passing an id
         deleteFriend: {
-            type: FriendType,
+            type: DeleteType,
             args: {
                 id: { type: new GraphQLNonNull(GraphQLID) }
             },

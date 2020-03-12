@@ -213,7 +213,6 @@ describe('GraphQL tests: deleting friends', () => {
         const response = await supertest(app)
             .post('/graphql')
             .send({ query: queryFriends });
-        // console.log(response);
         const { data: { friends } } = JSON.parse(response.text);
 
         // since the document was deleted, we expect to find nothing
