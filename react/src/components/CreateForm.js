@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 class CreateForm extends Component {
     state = {
         name: '',
-        age: null
+        age: ''
     };
 
-    onInputChange = fieldName => {
-        return event => this.setState({ [fieldName]: event.target.value });
-    };
+    onInputChange = event => {
+        this.setState({ [event.target.name]: event.target.value });
+    }
 
     onFormSubmit = () => {
         const { name, age } = this.state;
@@ -24,11 +24,11 @@ class CreateForm extends Component {
                 <h2>Add a new entry</h2>
                 <div>
                     <label>Name</label>
-                    <input type='text' name='name' onChange={this.onInputChange('name')} value={name} />
+                    <input type='text' name='name' onChange={this.onInputChange} value={name} />
                 </div>
                 <div>
                     <label>Age</label>
-                    <input type='text' name='age' onChange={this.onInputChange('age')} value={age} />
+                    <input type='text' name='age' onChange={this.onInputChange} value={age} />
                 </div>
                 <input type='submit' />
             </form>
