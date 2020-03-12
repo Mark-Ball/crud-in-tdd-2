@@ -44,10 +44,20 @@ const updateFriend = `
     }
 `;
 
+const deleteFriend = `
+    mutation($id: ID!) {
+        deleteFriend(id: $id) {
+            name
+            age
+        }
+    }
+`;
+
 module.exports = {
     queryFriends,
     badQuery,
     queryFriend,
     createFriend,
-    updateFriend
+    updateFriend,
+    deleteFriend
 };

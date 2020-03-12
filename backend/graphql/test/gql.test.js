@@ -8,7 +8,8 @@ const {
     badQuery,
     queryFriend,
     createFriend,
-    updateFriend
+    updateFriend,
+    deleteFriend
 } = require('./mockQueries');
 
 let mongoose;
@@ -199,16 +200,24 @@ describe('GraphQL tests: editing friends', () => {
 });
 
 describe('GraphQL tests: deleting friends', () => {
-    it('should delete a friend when the id is provided', async () => {
+    it.only('should delete a friend when the id is provided', async () => {
         const postData = {
-            query: deleteFriend, // create this in mockQueries
+            query: deleteFriend,
             variables: { id }
         };
-        const response = await supertest(app)
+        await supertest(app)
             .post('/graphql')
             .send(postData);
-        
-        expect(response.status).toBe(200);
+
+        // search for the document which was just deleted to confirm that it is not there
+        const response = await supertest(app)
+            .post('/graphql')
+            .send({ query: queryFriends });
+        // console.log(response);
+        const { data: { friends } } = JSON.parse(response.text);
+
+        // since the document was deleted, we expect to find nothing
+        expect(friends).toHaveLength(0);
     });
 
     it('should error when no id is provided', async () => {

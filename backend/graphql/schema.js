@@ -13,11 +13,11 @@ const {
 
 const FriendType = new GraphQLObjectType({
     name: 'Friend',
-    fields: () => ({
+    fields: {
         id: { type: GraphQLID },
         name: { type: GraphQLString },
         age: { type: GraphQLInt }
-    })
+    }
 });
 
 const RootQuery = new GraphQLObjectType({
@@ -70,6 +70,17 @@ const Mutation = new GraphQLObjectType({
                 if (name) doc.name = name;
                 if (age) doc.age = age;
                 return doc.save()
+            }
+        },
+        // delete a friend by passing an id
+        deleteFriend: {
+            type: FriendType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            async resolve(parent, args) {
+                const { id } = args;
+                return FriendModel.deleteOne({ _id: id });
             }
         }
     }
