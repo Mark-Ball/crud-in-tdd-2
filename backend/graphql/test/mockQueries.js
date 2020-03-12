@@ -47,8 +47,7 @@ const updateFriend = `
 const deleteFriend = `
     mutation($id: ID!) {
         deleteFriend(id: $id) {
-            name
-            age
+            ok
         }
     }
 `;

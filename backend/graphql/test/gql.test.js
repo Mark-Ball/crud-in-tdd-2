@@ -200,23 +200,26 @@ describe('GraphQL tests: editing friends', () => {
 });
 
 describe('GraphQL tests: deleting friends', () => {
-    it.only('should delete a friend when the id is provided', async () => {
+    it('should delete a friend when the id is provided', async () => {
         const postData = {
             query: deleteFriend,
             variables: { id }
         };
-        await supertest(app)
+        // check the response from the delete mutation
+        const response1 = await supertest(app)
             .post('/graphql')
             .send(postData);
+        const { data: { deleteFriend: { ok } } } = JSON.parse(response1.text);
 
         // search for the document which was just deleted to confirm that it is not there
-        const response = await supertest(app)
+        const response2 = await supertest(app)
             .post('/graphql')
             .send({ query: queryFriends });
-        const { data: { friends } } = JSON.parse(response.text);
+        const { data: { friends } } = JSON.parse(response2.text);
 
         // since the document was deleted, we expect to find nothing
         expect(friends).toHaveLength(0);
+        expect(ok).toBe(1);
     });
 
     it('should error when no id is provided', async () => {
